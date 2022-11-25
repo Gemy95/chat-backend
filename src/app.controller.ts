@@ -4,6 +4,7 @@ import {
   ClientProxyFactory,
   Transport,
 } from '@nestjs/microservices';
+import { User } from '../micro-services/registration-service/models/user.model';
 import { AppService } from './app.service';
 import { RegisterUserDto } from './dto/register.user.dto';
 
@@ -35,8 +36,8 @@ export class AppController {
   }
 
   @Post('/user/register')
-  async register(@Body() data: RegisterUserDto) {
-    const user = await this.registrationClient.send('/user/register', data);
+  async register(@Body() data: RegisterUserDto): Promise<User> {
+    const user = await this.registrationClient.send('/user/register', data) as unknown as User;
     return user;
   }
 
