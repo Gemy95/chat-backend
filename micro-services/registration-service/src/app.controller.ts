@@ -1,9 +1,11 @@
 import { Controller, UseFilters } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
-import { ExceptionFilter } from '../filters/rpc-exception.filter.ts';
-import { User } from '../models/user.model';
+import { ExceptionFilter } from './filters/rpc-exception.filter.ts';
+import { User } from './models/user.model';
 import { AppService } from './app.service';
+import { LoginUserDto } from './dto/login.user.dto';
 import { RegisterUserDto } from './dto/register.user.dto';
+import { ResetPasswordDto } from './dto/reset-password.user.dto';
 
 @Controller()
 export class AppController {
@@ -11,7 +13,19 @@ export class AppController {
 
   @UseFilters(new ExceptionFilter())
   @MessagePattern('/user/register')
-  register(data: RegisterUserDto): Promise<User> {
+  registerUser(data: RegisterUserDto): Promise<User> {
     return this.appService.registerUser(data);
+  }
+
+  @UseFilters(new ExceptionFilter())
+  @MessagePattern('/user/login')
+  loginUser(data: LoginUserDto): Promise<any> {
+    return this.appService.loginUser(data);
+  }
+
+  @UseFilters(new ExceptionFilter())
+  @MessagePattern('/user/reset-password')
+  resetPasswordUser(data: ResetPasswordDto): Promise<any> {
+    return this.appService.resetPasswordUser(data);
   }
 }
