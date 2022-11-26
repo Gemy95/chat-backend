@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from '../models/user.model';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { SharedAuthModule } from './authentication/shared/auth.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { AppService } from './app.service';
       inject: [ConfigService],
     }),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    SharedAuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
