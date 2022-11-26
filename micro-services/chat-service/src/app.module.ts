@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { REDIS_USER_NAME_SPACE } from './common/constants';
+import { ClientGateWay } from './socket.gateway';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { REDIS_USER_NAME_SPACE } from './common/constants';
     }),
     RedisModule.forRootAsync({
       imports: [ConfigModule],
+      inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         return {
           readyLog: true,
@@ -31,6 +33,6 @@ import { REDIS_USER_NAME_SPACE } from './common/constants';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, ClientGateWay],
 })
 export class AppModule {}
