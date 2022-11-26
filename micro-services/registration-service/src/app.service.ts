@@ -29,10 +29,12 @@ export class AppService {
   }
 
   async resetPasswordUser(resetPasswordDto: ResetPasswordDto) {
-    const currentUser = await this.userModel.findOne({
-      activationCode: resetPasswordDto.activationCode,
-      isActivated: false,
-    });
+    const currentUser = await (
+      await this.userModel.findOne({
+        activationCode: resetPasswordDto.activationCode,
+        isActivated: false,
+      })
+    )?.toJSON();
 
     if (!currentUser) {
       throw new RpcException('This account not found');
