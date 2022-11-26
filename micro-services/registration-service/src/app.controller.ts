@@ -18,14 +18,15 @@ export class AppController {
   }
 
   @UseFilters(new ExceptionFilter())
+  @MessagePattern('/user/reset-password')
+  resetPasswordUser(data: ResetPasswordDto): Promise<any> {
+    return this.appService.resetPasswordUser(data);
+  }
+
+  @UseFilters(new ExceptionFilter())
   @MessagePattern('/user/login')
   loginUser(data: LoginUserDto): Promise<any> {
     return this.appService.loginUser(data);
   }
 
-  @UseFilters(new ExceptionFilter())
-  @MessagePattern('/user/reset-password')
-  resetPasswordUser(data: ResetPasswordDto): Promise<any> {
-    return this.appService.resetPasswordUser(data);
-  }
 }

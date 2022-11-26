@@ -42,7 +42,7 @@ export class AppService {
       SALT_OR_ROUNDS,
     );
 
-    await this.userModel.updateOne(
+    const user = await this.userModel.updateOne(
       {
         activationCode: resetPasswordDto.activationCode,
       },
@@ -51,12 +51,18 @@ export class AppService {
         isActivated: true,
       },
     );
+
+    delete user?.['password'];
+
+    return user;
   }
 
   async loginUser(loginUserDto: LoginUserDto): Promise<any> {
-    const currentUser = await this.userModel.findOne({
-      email: loginUserDto.email,
-    });
+    const currentUser = await (
+      await this.userModel.findOne({
+        email: loginUserDto.email,
+      })
+    )?.toJSON();
 
     if (!currentUser) {
       throw new RpcException('This email not found');

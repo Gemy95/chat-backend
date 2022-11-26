@@ -41,7 +41,7 @@ export class TransformInterceptor<T>
         map((response) => ({
           statusCode: context.switchToHttp().getResponse().statusCode,
           message: response?.message || getMessageFromMethod(context.switchToHttp().getResponse().req.method),
-          data: response?.data || {}
+          data: response || {}
         })),
       );
   }

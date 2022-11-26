@@ -23,5 +23,5 @@ export class ResetPasswordDto {
     message: 'Incorrect confirm password',
   })
   @Match('newPassword', { message: "new passwords don't match" })
-  confirm_password: string;
+  confirmPassword: string;
 }

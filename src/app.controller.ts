@@ -70,5 +70,6 @@ export class AppController {
     return firstValueFrom(
        this.registrationClient.send("/user/reset-password", resetPasswordDto)
     );
+
   }
 }
