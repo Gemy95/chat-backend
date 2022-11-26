@@ -12,14 +12,14 @@ export class AppService {
   ) {}
 
   async send(data: SendDto): Promise<any> {
-    return await this.mailerService
+    return this.mailerService
       .sendMail({
         to: data.email,
         from: `"ali gamal" <${this.configSerice.get<string>('MAIL_USER')}>`,
         subject: 'Welcome',
         template: join(__dirname, 'templates', 'user-activation.hbs'),
         context: {
-          url: 'cf1a3f828287',
+          url: data.activationCode,
           name: data.name,
         },
       })

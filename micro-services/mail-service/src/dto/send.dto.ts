@@ -12,4 +12,9 @@ export class SendDto {
   @IsNotEmpty()
   @IsEmail()
   email: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  activationCode: string;
 }
