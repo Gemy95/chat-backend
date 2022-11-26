@@ -16,8 +16,19 @@ export class User {
   })
   email: string;
 
+  @Prop({
+    type: String,
+    required: false,
+    unique: true,
+    dropDups: true,
+  })
+  activationCode: string;
+
   @Prop({ type: Boolean, required: false, default: false })
   isActivated: boolean;
+
+  @Prop({ type: String, required: false })
+  password: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
