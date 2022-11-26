@@ -31,6 +31,7 @@ export class AppService {
   async resetPasswordUser(resetPasswordDto: ResetPasswordDto) {
     const currentUser = await this.userModel.findOne({
       activationCode: resetPasswordDto.activationCode,
+      isActivated: false,
     });
 
     if (!currentUser) {
