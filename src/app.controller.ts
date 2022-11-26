@@ -1,9 +1,14 @@
+import { BadRequestException } from '@nestjs/common';
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import {
   ClientProxy,
   ClientProxyFactory,
   Transport,
 } from '@nestjs/microservices';
+import { firstValueFrom, last } from 'rxjs';
+import { Observable } from 'rxjs';
+import { async, first } from 'rxjs';
+import { SendDto } from '../micro-services/mail-service/dist/dto/send.dto';
 import { User } from '../micro-services/registration-service/models/user.model';
 import { AppService } from './app.service';
 import { RegisterUserDto } from './dto/register.user.dto';
@@ -17,14 +22,14 @@ export class AppController {
     this.registrationClient = ClientProxyFactory.create({
       transport: Transport.TCP,
       options: {
-        host: '127.0.0.1',
+        host: "127.0.0.1",
         port: 8866,
       },
     });
     this.mailClient = ClientProxyFactory.create({
       transport: Transport.TCP,
       options: {
-        host: '127.0.0.1',
+        host: "127.0.0.1",
         port: 8877,
       },
     });
@@ -35,17 +40,20 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @Post('/user/register')
-  async register(@Body() data: RegisterUserDto): Promise<User> {
-    const user = await this.registrationClient.send('/user/register', data) as unknown as User;
-    return user;
-  }
+  @Post("/user/register")
+  async register(@Body() registerUserDto: RegisterUserDto) {
+    const user = await firstValueFrom(
+       this.registrationClient.send("/user/register", registerUserDto)
+    );
 
-  @Get('/test')
-  async test(): Promise<any> {
-    return await this.mailClient.send('/mail/send', {
-      name: 'ali',
-      email: 'ali.gamal95880@gmail',
-    });
+    await firstValueFrom(
+       this.mailClient.send("/mail/send", {
+        name: user["name"],
+        email: user["email"],
+        activationCode: user["activationCode"],
+      })
+    );
+
+    return user;
   }
 }
