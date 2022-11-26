@@ -1,4 +1,5 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
 import { AppService } from '../app.service';
 import { SendDto } from '../dto/send.dto';
 import { ConsumerService } from './consumer.service';
@@ -17,7 +18,7 @@ export class MailConsumer implements OnModuleInit {
       onMessage: async (message) => {
         const data: SendDto = JSON.parse(message?.value?.toString());
         if (!data) {
-          throw new Error('Error Empty Data!');
+          throw new RpcException('Error Empty Data!');
         }
         return this.appService.send(data);
       },

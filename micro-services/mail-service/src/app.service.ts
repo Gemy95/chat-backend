@@ -1,8 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import { SendDto } from './dto/send.dto';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class AppService {
@@ -28,7 +29,7 @@ export class AppService {
       })
       .catch((error) => {
         console.log('error=', error);
-        throw new BadRequestException('failed to send email, ', error.message);
+        throw new RpcException(error.message);
       });
   }
 }

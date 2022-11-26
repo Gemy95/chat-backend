@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './models/user.model';
@@ -9,6 +9,7 @@ import { ResetPasswordDto } from './dto/reset-password.user.dto';
 import * as bcrypt from 'bcrypt';
 import { AuthService } from './authentication/shared/auth.service';
 import { AuthUserType } from './authentication/shared/constants/auth.types.enum';
+import { RpcException } from '@nestjs/microservices';
 
 const SALT_OR_ROUNDS = 10;
 
@@ -33,7 +34,7 @@ export class AppService {
     });
 
     if (!currentUser) {
-      throw new BadRequestException('This account not found');
+      throw new RpcException('This account not found');
     }
 
     const hashedPassword = await bcrypt.hash(
@@ -58,11 +59,11 @@ export class AppService {
     });
 
     if (!currentUser) {
-      throw new BadRequestException('This email not found');
+      throw new RpcException('This email not found');
     }
 
     if (!currentUser.isActivated) {
-      throw new BadRequestException('Please Activate your account');
+      throw new RpcException('Please Activate your account');
     }
 
     const isMatch = await bcrypt.compare(
@@ -71,7 +72,7 @@ export class AppService {
     );
 
     if (!isMatch) {
-      throw new BadRequestException('Incorrect Password');
+      throw new RpcException('Incorrect Password');
     }
 
     delete currentUser.password;

@@ -1,4 +1,3 @@
-import { BadRequestException } from '@nestjs/common';
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import {
   ClientProxy,
@@ -7,11 +6,13 @@ import {
 } from '@nestjs/microservices';
 import { firstValueFrom, last } from 'rxjs';
 import { Observable } from 'rxjs';
-import { async, first } from 'rxjs';
+import { first } from 'rxjs';
 import { SendDto } from '../micro-services/mail-service/dist/dto/send.dto';
-import { User } from '../micro-services/registration-service/models/user.model';
+import { User } from '../micro-services/registration-service/src/models/user.model';
 import { AppService } from './app.service';
+import { LoginUserDto } from './dto/login.user.dto';
 import { RegisterUserDto } from './dto/register.user.dto';
+import { ResetPasswordDto } from './dto/reset-password.user.dto';
 
 @Controller()
 export class AppController {
@@ -55,5 +56,19 @@ export class AppController {
     );
 
     return user;
+  }
+
+  @Post("/user/login")
+  async login(@Body() loginUserDto: LoginUserDto) {
+    return firstValueFrom(
+       this.registrationClient.send("/user/login", loginUserDto)
+    );
+  }
+
+  @Post("/user/reset-password")
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return firstValueFrom(
+       this.registrationClient.send("/user/reset-password", resetPasswordDto)
+    );
   }
 }

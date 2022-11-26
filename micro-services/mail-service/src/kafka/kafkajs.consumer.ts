@@ -10,6 +10,7 @@ import {
 import * as retry from 'async-retry';
 import { sleep } from '../utils/sleep';
 import { IConsumer } from './consumer.interface';
+import { RpcException } from '@nestjs/microservices';
 
 export class KafkajsConsumer implements IConsumer {
   private readonly kafka: Kafka;
@@ -45,7 +46,7 @@ export class KafkajsConsumer implements IConsumer {
             'Error consuming message. Adding to dead letter queue...',
             err,
           );
-          throw new BadGatewayException(err.message);
+          throw new RpcException(err.message);
         }
       },
     });
