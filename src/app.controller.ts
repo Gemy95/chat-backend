@@ -1,3 +1,4 @@
+import { Patch } from '@nestjs/common';
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import {
   ClientProxy,
@@ -58,6 +59,13 @@ export class AppController {
     return user;
   }
 
+  @Patch("/user/reset-password")
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return firstValueFrom(
+       this.registrationClient.send("/user/reset-password", resetPasswordDto)
+    );
+  }
+  
   @Post("/user/login")
   async login(@Body() loginUserDto: LoginUserDto) {
     return firstValueFrom(
@@ -65,11 +73,4 @@ export class AppController {
     );
   }
 
-  @Post("/user/reset-password")
-  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
-    return firstValueFrom(
-       this.registrationClient.send("/user/reset-password", resetPasswordDto)
-    );
-
-  }
 }
