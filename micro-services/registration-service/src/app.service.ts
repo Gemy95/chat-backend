@@ -19,7 +19,7 @@ export class AppService {
     private authService: AuthService,
   ) {}
 
-  registerUser(registerUserDto: RegisterUserDto): Promise<User> {
+  registerUser(registerUserDto: RegisterUserDto) {
     const createdUser = new this.userModel({
       ...registerUserDto,
       activationCode: generateActivationCode(),
