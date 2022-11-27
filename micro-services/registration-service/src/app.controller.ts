@@ -28,5 +28,4 @@ export class AppController {
   loginUser(data: LoginUserDto): Promise<any> {
     return this.appService.loginUser(data);
   }
-
 }
