@@ -6,5 +6,4 @@ export class ConversationGateWayDto {
   @IsString()
   @IsNotEmpty()
   message: string;
-
 }

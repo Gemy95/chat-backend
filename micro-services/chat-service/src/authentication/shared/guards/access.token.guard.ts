@@ -34,7 +34,7 @@ export class AccessTokenAuthGuard extends AuthGuard([
       request?.header?.('Authorization') ||
       request?.handshake?.auth?.Authorization;
 
-      const requestType =
+    const requestType =
       request?.handshake?.query?.transport == 'websocket' ? 'SOCKET' : 'HTTP';
 
     if (!header && requestType == 'HTTP') {

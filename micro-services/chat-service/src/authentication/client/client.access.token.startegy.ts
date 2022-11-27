@@ -10,7 +10,9 @@ export class AccessTokenClientStrategy extends PassportStrategy(
 ) {
   constructor(private configService: ConfigService) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        ExtractJwt.fromBodyField('Authorization'),
+      ]),
       ignoreExpiration: false,
       secretOrKey: Buffer.from(
         configService.get<string>('ACCESS_TOKEN_CLIENT_PUBLIC_KEY'),
