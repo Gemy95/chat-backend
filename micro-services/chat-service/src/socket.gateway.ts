@@ -1,6 +1,5 @@
 import { RedisService } from '@liaoliaots/nestjs-redis';
 import { Logger, UseFilters, UseGuards } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import {
   WebSocketGateway,
   OnGatewayConnection,
@@ -10,16 +9,18 @@ import {
   SubscribeMessage,
   MessageBody,
 } from '@nestjs/websockets';
-import { Model } from 'mongoose';
 import { Server, Socket } from 'socket.io';
-import { CLIENT_NAMESPACE, REDIS_USER_NAME_SPACE } from './common/constants';
+import { AppService } from './app.service';
+import { CurrentUser } from './authentication/shared/decorator/user.dcorator';
+import { AccessTokenAuthGuard } from './authentication/shared/guards/access.token.guard';
+import {
+  SOCKET_USER_NAMESPACE,
+  REDIS_USERS_CHAT_ROOM,
+  REDIS_USER_MESSAGES,
+} from './common/constants';
 import { ClientGateWayDto } from './dto/client.gateway.dto';
 import { ConversationGateWayDto } from './dto/conversation.gateway.dto';
 import { WsExceptionsFilter } from './filters/socket.filter';
-import {
-  Conversation,
-  ConversationDocument,
-} from './models/conversation.model';
 
 @WebSocketGateway({
   transport: ['websocket', 'polling'],
@@ -27,7 +28,7 @@ import {
     origin: '*',
     methods: ['GET', 'POST'],
   },
-  namespace: CLIENT_NAMESPACE,
+  namespace: SOCKET_USER_NAMESPACE,
 })
 @UseFilters(new WsExceptionsFilter())
 export class ClientGateWay implements OnGatewayConnection, OnGatewayDisconnect {
@@ -35,8 +36,7 @@ export class ClientGateWay implements OnGatewayConnection, OnGatewayDisconnect {
 
   constructor(
     private readonly redisService: RedisService,
-    @InjectModel(Conversation.name)
-    private conversationModel: Model<ConversationDocument>,
+    private readonly appService: AppService,
   ) {}
   private logger = new Logger(ClientGateWay.name);
 
@@ -51,26 +51,33 @@ export class ClientGateWay implements OnGatewayConnection, OnGatewayDisconnect {
     this.logger.log(`Socket disconnected`);
   }
 
-  async updateConversationRoomByMessage(
-    data: ConversationGateWayDto,
-  ): Promise<any> {
-    return this.server.in(REDIS_USER_NAME_SPACE).emit('new-message', data);
+  async notifyUsersByNewMessage(data: ConversationGateWayDto): Promise<any> {
+    return this.server.in(REDIS_USERS_CHAT_ROOM).emit('new-message', data);
   }
 
-  // @UseGuards(JwtAuthGuard)
+  async sendLastTenMessagesToUser(): Promise<any> {
+    const messages = await this.appService.getLastUsersMessages();
+    return this.server
+      .in(REDIS_USERS_CHAT_ROOM)
+      .emit('availble-messages', messages);
+  }
+
+  @UseGuards(AccessTokenAuthGuard)
   @SubscribeMessage('send-message')
   async onReceiveMessage(
     @ConnectedSocket() socket: Socket,
     @MessageBody() data: ConversationGateWayDto,
+    @CurrentUser() currentUser: any,
   ): Promise<any> {
-    await this.conversationModel.create({
-      message: data.message,
-      user: data.user,
-    });
-    await this.updateConversationRoomByMessage(data);
+    console.log('currentUser=', currentUser);
+    await this.appService.createUserMessage(
+      { message: data.message },
+      currentUser._id,
+    );
+    await this.notifyUsersByNewMessage(data);
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(AccessTokenAuthGuard)
   @SubscribeMessage('join')
   async onJoin(
     @ConnectedSocket() socket: Socket,
@@ -80,7 +87,7 @@ export class ClientGateWay implements OnGatewayConnection, OnGatewayDisconnect {
   }> {
     try {
       let room = await this.redisService
-        .getClient(REDIS_USER_NAME_SPACE)
+        .getClient(REDIS_USERS_CHAT_ROOM)
         .get(`${data.roomId}`);
 
       if (!room) {
@@ -94,6 +101,6 @@ export class ClientGateWay implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   private createRoom(room: string): Promise<'OK'> {
-    return this.redisService.getClient(REDIS_USER_NAME_SPACE).set(room, '');
+    return this.redisService.getClient(REDIS_USERS_CHAT_ROOM).set(room, '');
   }
 }

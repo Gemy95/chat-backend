@@ -7,8 +7,4 @@ export class ConversationGateWayDto {
   @IsNotEmpty()
   message: string;
 
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  user: string;
 }
