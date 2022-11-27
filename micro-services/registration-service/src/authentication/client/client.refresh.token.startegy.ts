@@ -12,7 +12,10 @@ export class RefreshTokenClientStrategy extends PassportStrategy(
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>('REFRESH_TOKEN_CLIENT_PUBLIC_KEY'),
+      secretOrKey: Buffer.from(
+        configService.get<string>('REFRESH_TOKEN_CLIENT_PUBLIC_KEY'),
+        'base64',
+      ).toString('ascii'),
       algorithms: ['RS256'],
     });
   }

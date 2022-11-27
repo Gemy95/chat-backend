@@ -10,9 +10,11 @@ export class AccessTokenClientStrategy extends PassportStrategy(
 ) {
   constructor(private configService: ConfigService) {
     super({
-      jwtFromRequest: ExtractJwt.fromExtractors([
-        ExtractJwt.fromBodyField('Authorization'),
-      ]),
+      jwtFromRequest: (req: Request) => {
+        const parts = req['handshake'].auth?.Authorization.split(' ');
+        const token = parts[1];
+        return token;
+      },
       ignoreExpiration: false,
       secretOrKey: Buffer.from(
         configService.get<string>('ACCESS_TOKEN_CLIENT_PUBLIC_KEY'),

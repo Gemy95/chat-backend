@@ -1,5 +1,10 @@
 import { RedisService } from '@liaoliaots/nestjs-redis';
-import { Logger, UseFilters, UseGuards } from '@nestjs/common';
+import {
+  Logger,
+  UseFilters,
+  UseGuards,
+  WsExceptionFilter,
+} from '@nestjs/common';
 import {
   WebSocketGateway,
   OnGatewayConnection,
@@ -30,6 +35,7 @@ import { WsExceptionsFilter } from './filters/socket.filter';
   },
   namespace: SOCKET_USER_NAMESPACE,
 })
+
 @UseFilters(new WsExceptionsFilter())
 export class ClientGateWay implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;

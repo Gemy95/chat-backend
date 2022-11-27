@@ -12,7 +12,10 @@ export class AccessTokenClientStrategy extends PassportStrategy(
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>('ACCESS_TOKEN_CLIENT_PUBLIC_KEY'),
+      secretOrKey: Buffer.from(
+        configService.get<string>('ACCESS_TOKEN_CLIENT_PUBLIC_KEY'),
+        'base64',
+      ).toString('ascii'),
       algorithms: ['RS256'],
     });
   }
