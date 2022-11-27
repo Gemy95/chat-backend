@@ -75,7 +75,6 @@ export class ClientGateWay implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: ConversationGateWayDto,
     @CurrentUser() currentUser: any,
   ): Promise<any> {
-    console.log('currentUser=', currentUser);
     await this.appService.createUserMessage(
       { message: data.message },
       currentUser._id,
