@@ -1,5 +1,6 @@
 import { RedisService } from '@liaoliaots/nestjs-redis';
 import { Logger, UseFilters, UseGuards } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
 import {
   WebSocketGateway,
   OnGatewayConnection,
@@ -9,10 +10,16 @@ import {
   SubscribeMessage,
   MessageBody,
 } from '@nestjs/websockets';
+import { Model } from 'mongoose';
 import { Server, Socket } from 'socket.io';
 import { CLIENT_NAMESPACE, REDIS_USER_NAME_SPACE } from './common/constants';
 import { ClientGateWayDto } from './dto/client.gateway.dto';
+import { ConversationGateWayDto } from './dto/conversation.gateway.dto';
 import { WsExceptionsFilter } from './filters/socket.filter';
+import {
+  Conversation,
+  ConversationDocument,
+} from './models/conversation.model';
 
 @WebSocketGateway({
   transport: ['websocket', 'polling'],
@@ -26,7 +33,11 @@ import { WsExceptionsFilter } from './filters/socket.filter';
 export class ClientGateWay implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
 
-  constructor(private readonly redisService: RedisService) {}
+  constructor(
+    private readonly redisService: RedisService,
+    @InjectModel(Conversation.name)
+    private conversationModel: Model<ConversationDocument>,
+  ) {}
   private logger = new Logger(ClientGateWay.name);
 
   async handleConnection(@ConnectedSocket() socket: Socket) {
@@ -40,8 +51,23 @@ export class ClientGateWay implements OnGatewayConnection, OnGatewayDisconnect {
     this.logger.log(`Socket disconnected`);
   }
 
-  public async emitNewMessageToUsers(data: any): Promise<any> {
+  async updateConversationRoomByMessage(
+    data: ConversationGateWayDto,
+  ): Promise<any> {
     return this.server.in(REDIS_USER_NAME_SPACE).emit('new-message', data);
+  }
+
+  // @UseGuards(JwtAuthGuard)
+  @SubscribeMessage('send-message')
+  async onReceiveMessage(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() data: ConversationGateWayDto,
+  ): Promise<any> {
+    await this.conversationModel.create({
+      message: data.message,
+      user: data.user,
+    });
+    await this.updateConversationRoomByMessage(data);
   }
 
   // @UseGuards(JwtAuthGuard)
