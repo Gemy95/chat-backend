@@ -35,7 +35,6 @@ import { WsExceptionsFilter } from './filters/socket.filter';
   },
   namespace: SOCKET_USER_NAMESPACE,
 })
-
 @UseFilters(new WsExceptionsFilter())
 export class ClientGateWay implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
@@ -61,11 +60,9 @@ export class ClientGateWay implements OnGatewayConnection, OnGatewayDisconnect {
     return this.server.in(REDIS_USERS_CHAT_ROOM).emit('new-message', data);
   }
 
-  async sendLastTenMessagesToUser(): Promise<any> {
+  async sendLastTenMessagesToUser(socketId: string): Promise<any> {
     const messages = await this.appService.getLastUsersMessages();
-    return this.server
-      .in(REDIS_USERS_CHAT_ROOM)
-      .emit('availble-messages', messages);
+    await this.server.to(socketId).emit('available-messages', messages);
   }
 
   @UseGuards(AccessTokenAuthGuard)
@@ -98,7 +95,11 @@ export class ClientGateWay implements OnGatewayConnection, OnGatewayDisconnect {
       if (!room) {
         room = await this.createRoom(`${data.roomId}`);
       }
-      return socket.join(`${data.roomId}`);
+      const result = socket.join(`${data.roomId}`);
+
+      await this.sendLastTenMessagesToUser(socket.id);
+
+      return result;
     } catch (error) {
       this.logger.error(error);
       return { success: false };

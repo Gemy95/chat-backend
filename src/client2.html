@@ -21,7 +21,11 @@
         socket.emit('send-message', { message: 'test from ali' });
 
         socket.on('new-message',(data)=>{
-           console.log("data1=",data);
+           console.log("new-message =",data);
+        });
+      
+        socket.on('available-messages',(data)=>{
+           console.log("available-messages=",data);
         });
 
       });

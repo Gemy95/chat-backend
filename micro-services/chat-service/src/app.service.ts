@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { ConversationGateWayDto } from './dto/conversation.gateway.dto';
 import {
   Conversation,
@@ -24,15 +24,18 @@ export class AppService {
   async createUserMessage(data: ConversationGateWayDto, user: string) {
     await this.conversationModel.create({
       message: data.message,
-      user,
+      user: new mongoose.Types.ObjectId(user),
     });
   }
 
   async getLastUsersMessages() {
-    return this.conversationModel.find({}, null, { limit: 10 }).populate({
-      path: 'user',
-      model: 'user',
-      select: { email: 1, name: 1, _id: 1 },
-    });
+    const result = await this.conversationModel
+      .find({}, null, { limit: 10 })
+      .populate({
+        path: 'user',
+        model: 'User',
+        select: '_id name email',
+      });
+    return result;
   }
 }
