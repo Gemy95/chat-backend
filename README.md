@@ -26,35 +26,14 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
-## Installation
+## Installation And ## Running the app
 
 ```bash
-$ npm install
-```
-
-## Running the app
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
+1- npm install command for all main service ,registration service , mail service , chat service
+2- create chatDB on mongodb database
+3- run docker composer (docker-compose.yml) by this command docker-compose -f docker-compose.yml up -d
+for running kafka
+4- use this command ( npm run start:dev ) for all main service ,registration service , mail service , chat service
+5- for showing swagger apis use this url http://localhost:4000/api/
+6- for front end go to this repo https://github.com/Gemy95/chat-front-end.git as angular app
+7- for running tests from registartion service use this command // sudo npm run test -- app.controller.spec.ts
