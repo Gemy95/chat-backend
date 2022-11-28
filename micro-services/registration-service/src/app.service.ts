@@ -76,7 +76,7 @@ export class AppService {
       throw new RpcException('Please Activate your account');
     }
 
-    const isMatch = await bcrypt.compare(
+    const isMatch = await bcrypt.compareSync(
       loginUserDto.password,
       currentUser.password,
     );
