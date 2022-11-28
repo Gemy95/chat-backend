@@ -20,7 +20,9 @@ export class AppService {
         subject: 'Welcome',
         template: join(__dirname, 'templates', 'user-activation.hbs'),
         context: {
-          url: data.activationCode,
+          url: `${this.configSerice.get<string>(
+            'FRONT_END_REDIRECT_URL',
+          )}?code=${data.activationCode}`,
           name: data.name,
         },
       })
