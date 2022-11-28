@@ -76,7 +76,7 @@ export class AppService {
     }
 
     const isMatch = await bcrypt.compare(
-      loginUserDto.passowrd,
+      loginUserDto.password,
       currentUser.password,
     );
 

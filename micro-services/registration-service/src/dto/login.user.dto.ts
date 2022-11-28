@@ -11,5 +11,5 @@ export class LoginUserDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  passowrd: string;
+  password: string;
 }
