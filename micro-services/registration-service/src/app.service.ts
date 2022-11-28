@@ -29,7 +29,6 @@ export class AppService {
   }
 
   async resetPasswordUser(resetPasswordDto: ResetPasswordDto) {
-
     const currentUser = await (
       await this.userModel.findOne({
         activationCode: resetPasswordDto.activationCode,
@@ -46,7 +45,7 @@ export class AppService {
       SALT_OR_ROUNDS,
     );
 
-    const user = await this.userModel.updateOne(
+    await this.userModel.updateOne(
       {
         activationCode: resetPasswordDto.activationCode,
       },
@@ -55,10 +54,7 @@ export class AppService {
         isActivated: true,
       },
     );
-
-    delete user?.['password'];
-
-    return user;
+    return 'updated';
   }
 
   async loginUser(loginUserDto: LoginUserDto): Promise<any> {
