@@ -1,0 +1,23 @@
+FROM node:18-alpine As production
+
+ENV DATABASE_URL=mongodb://localhost:27017/chatDB
+
+ENV PORT=3001
+
+ENV MAIL_USER=gemy.omda880@gmail.com
+ENV MAIL_PASSWORD=pazfcuyjzhaaadha
+
+ENV KAFKA_BROKER=localhost:9092
+
+ENV FRONT_END_REDIRECT_URL=http://localhost/4200/active-account
+
+ENV WORKDIR /usr/src/service
+
+COPY ./package.json /usr/src/service/package.json
+COPY ./package-lock.json /usr/src/service/package-lock.json
+
+RUN npm i 
+
+COPY . /usr/src/service
+
+CMD npm run start:dev
