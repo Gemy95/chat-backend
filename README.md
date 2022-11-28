@@ -30,9 +30,9 @@
 
 ```bash
 1- npm install command for all main service ,registration service , mail service , chat service
-2- create chatDB on mongodb database
+2- create chatDB on localhost mongodb database on port 27017
 3- run docker composer (docker-compose.yml) by this command docker-compose -f docker-compose.yml up -d
-for running kafka
+for running kafka and redis
 4- use this command ( npm run start:dev ) for all main service ,registration service , mail service , chat service
 5- for showing swagger apis use this url http://localhost:4000/api/
 6- for front end go to this repo https://github.com/Gemy95/chat-front-end.git as angular app

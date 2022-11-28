@@ -14,3 +14,14 @@ services:
     environment:
       KAFKA_ADVERTISED_HOST_NAME: localhost
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+  cache:
+    image: redis
+    container_name: redis
+    ports:
+      - 6379:6379
+    command:
+      - redis-server
+      - /redis.conf
+    volumes:
+      - /redis.conf:/redis.conf  
+    restart: always      
