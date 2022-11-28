@@ -9,7 +9,7 @@ ENV MAIL_PASSWORD=pazfcuyjzhaaadha
 
 ENV KAFKA_BROKER=localhost:9092
 
-ENV FRONT_END_REDIRECT_URL=http://localhost/4200/active-account
+ENV FRONT_END_REDIRECT_URL=http://localhost/4200/reset-password
 
 ENV WORKDIR /usr/src/service
 
