@@ -7,12 +7,12 @@ import { HttpExceptionFilter } from './interceptors/error-handlling.interceptor'
 import { TransformInterceptor } from './interceptors/response-handlling.interceptor';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
-
+  const app = await NestFactory.create<NestExpressApplication>(AppModule,{cors:true});
+  
+  app.use(json({ limit: '50mb' }));
+  app.use(urlencoded({ limit: '50mb', extended: true }));
   app.enableCors();
-  app.use(json({ limit: '5mb' }));
-  app.use(urlencoded({ extended: true }));
-
+  
   const config = new DocumentBuilder()
     .setTitle('Chat example')
     .setDescription('The Chat API description')
