@@ -29,6 +29,7 @@ export class AppService {
   }
 
   async resetPasswordUser(resetPasswordDto: ResetPasswordDto) {
+
     const currentUser = await (
       await this.userModel.findOne({
         activationCode: resetPasswordDto.activationCode,
@@ -40,7 +41,7 @@ export class AppService {
       throw new RpcException('This account not found');
     }
 
-    const hashedPassword = await bcrypt.hash(
+    const hashedPassword = await bcrypt.hashSync(
       resetPasswordDto.newPassword,
       SALT_OR_ROUNDS,
     );
