@@ -22,10 +22,12 @@ import {
   SOCKET_USER_NAMESPACE,
   REDIS_USERS_CHAT_ROOM,
   REDIS_USER_MESSAGES,
+  CHAT_ROOM,
 } from './common/constants';
 import { ClientGateWayDto } from './dto/client.gateway.dto';
 import { ConversationGateWayDto } from './dto/conversation.gateway.dto';
 import { WsExceptionsFilter } from './filters/socket.filter';
+import { generateRoomValue } from './helpers/utils';
 
 @WebSocketGateway({
   transport: ['websocket', 'polling'],
@@ -57,12 +59,16 @@ export class ClientGateWay implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   async notifyUsersByNewMessage(
+    socket: any,
     data: ConversationGateWayDto,
     user: any,
   ): Promise<any> {
-    return this.server
-      .in(REDIS_USERS_CHAT_ROOM)
-      .emit('new-message', { ...data, user });
+    const roomId = await this.redisService
+      .getClient(REDIS_USERS_CHAT_ROOM)
+      .get(CHAT_ROOM);
+
+    // sending to all clients in 'room' room(channel) except sender
+    return socket.broadcast.to(roomId).emit('new-message', { ...data, user });
   }
 
   async sendLastTenMessagesToUser(socketId: string): Promise<any> {
@@ -81,7 +87,7 @@ export class ClientGateWay implements OnGatewayConnection, OnGatewayDisconnect {
       { message: data.message },
       currentUser._id,
     );
-    await this.notifyUsersByNewMessage(data, currentUser);
+    await this.notifyUsersByNewMessage(socket, data, currentUser);
   }
 
   @UseGuards(AccessTokenAuthGuard)
@@ -98,9 +104,10 @@ export class ClientGateWay implements OnGatewayConnection, OnGatewayDisconnect {
         .get(`${data.roomId}`);
 
       if (!room) {
-        room = await this.createRoom(`${data.roomId}`);
+        room = await this.createRoom(`${data.roomId}`, generateRoomValue());
       }
-      const result = socket.join(`${data.roomId}`);
+
+      const result = socket.join(room);
 
       await this.sendLastTenMessagesToUser(socket.id);
 
@@ -111,7 +118,8 @@ export class ClientGateWay implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  private createRoom(room: string): Promise<'OK'> {
-    return this.redisService.getClient(REDIS_USERS_CHAT_ROOM).set(room, '');
+  private createRoom(key: string, value: string) {
+    this.redisService.getClient(REDIS_USERS_CHAT_ROOM).set(key, value);
+    return value;
   }
 }
