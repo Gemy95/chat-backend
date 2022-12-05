@@ -35,7 +35,8 @@ export class AppService {
         path: 'user',
         model: 'User',
         select: '_id name email',
-      });
-    return result;
+      })
+      .sort({ createdAt: -1 });
+    return result.reverse();
   }
 }
