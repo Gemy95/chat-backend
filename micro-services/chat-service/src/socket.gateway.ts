@@ -56,8 +56,13 @@ export class ClientGateWay implements OnGatewayConnection, OnGatewayDisconnect {
     this.logger.log(`Socket disconnected`);
   }
 
-  async notifyUsersByNewMessage(data: ConversationGateWayDto): Promise<any> {
-    return this.server.in(REDIS_USERS_CHAT_ROOM).emit('new-message', data);
+  async notifyUsersByNewMessage(
+    data: ConversationGateWayDto,
+    user: any,
+  ): Promise<any> {
+    return this.server
+      .in(REDIS_USERS_CHAT_ROOM)
+      .emit('new-message', { ...data, user });
   }
 
   async sendLastTenMessagesToUser(socketId: string): Promise<any> {
@@ -76,7 +81,7 @@ export class ClientGateWay implements OnGatewayConnection, OnGatewayDisconnect {
       { message: data.message },
       currentUser._id,
     );
-    await this.notifyUsersByNewMessage(data);
+    await this.notifyUsersByNewMessage(data, currentUser);
   }
 
   @UseGuards(AccessTokenAuthGuard)
