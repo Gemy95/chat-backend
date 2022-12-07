@@ -60,7 +60,7 @@ export class ClientGateWay implements OnGatewayConnection, OnGatewayDisconnect {
 
   async notifyUsersByNewMessage(
     socket: any,
-    data: any,
+    data: ConversationGateWayDto,
     user: any,
   ): Promise<any> {
     const roomId = await this.redisService
@@ -87,7 +87,12 @@ export class ClientGateWay implements OnGatewayConnection, OnGatewayDisconnect {
       data,
       currentUser._id,
     );
-    await this.notifyUsersByNewMessage(socket, messageData, currentUser);
+    console.log('messageData=', messageData);
+    await this.notifyUsersByNewMessage(
+      socket,
+      { message: messageData.message, createdAt: messageData?.['createdAt'] },
+      currentUser,
+    );
   }
 
   @UseGuards(AccessTokenAuthGuard)

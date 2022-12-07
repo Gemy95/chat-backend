@@ -22,13 +22,10 @@ export class AppService {
   }
 
   async createUserMessage(data: ConversationGateWayDto, user: string) {
-    return this.conversationModel.create(
-      {
-        message: data.message,
-        user: new mongoose.Types.ObjectId(user),
-      },
-      { lean: true },
-    );
+    return this.conversationModel.create({
+      message: data.message,
+      user: new mongoose.Types.ObjectId(user),
+    });
   }
 
   async getLastUsersMessages() {
