@@ -87,10 +87,13 @@ export class ClientGateWay implements OnGatewayConnection, OnGatewayDisconnect {
       data,
       currentUser._id,
     );
-    console.log('messageData=', messageData);
+
     await this.notifyUsersByNewMessage(
       socket,
-      { message: messageData.message, createdAt: messageData?.['createdAt'] },
+      {
+        message: messageData.message,
+        createdAt: messageData?.['createdAt'].toString(),
+      },
       currentUser,
     );
   }
