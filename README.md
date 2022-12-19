@@ -39,3 +39,4 @@ for running kafka and redis
 7- for front end go to this repo https://github.com/Gemy95/chat-front-end.git as angular app
 8- for running unit tests from backend registartion service use this command // sudo npm run test -- app.controller.spec.ts
 ```
+# chat-backend
