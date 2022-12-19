@@ -40,3 +40,4 @@ for running kafka and redis
 8- for running unit tests from backend registartion service use this command // sudo npm run test -- app.controller.spec.ts
 ```
 # chat-backend
+# chat-backend
